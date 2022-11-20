@@ -44,7 +44,7 @@ export const register = () => {
 };
 
 export const success = (name) => {
-  const title = "Confrimation";
+  const title = "Confirmation";
   const body = `
   <h3>Successful registration! 🎉</h3>
   <h4>Please check your email, ${name}!</h4>

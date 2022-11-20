@@ -2,6 +2,9 @@ import express from "express";
 import clients from "./routes/clients.js";
 import register from "./routes/register.js";
 import { index } from "./views/pages.js";
+import * as db from "./data/db.js";
+
+db.connect();
 
 const app = express();
 

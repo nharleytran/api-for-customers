@@ -1,13 +1,12 @@
-// TODO update this and define a Mongoose schema and model!
-
+import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
-class Client {
-  constructor(name, email) {
-    this._id = uuidv4();
-    this.name = name;
-    this.email = email;
-  }
-}
+const ClientSchema = new mongoose.Schema({
+  name: { type: String, required: true},
+  email: { type: String, required: true, unique: true},
+  _id : {type: String, default: uuidv4()},
+})
+
+const Client = mongoose.model("Client", ClientSchema);
 
 export default Client;

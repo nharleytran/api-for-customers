@@ -1,10 +1,8 @@
 import Client from "../model/Client.js";
 import ApiError from "../model/ApiError.js";
 
+
 class ClientDao {
-  constructor() {
-    this.clients = [];
-  }
 
   // returns the new client data
   // name and email should be defined and nonempty (otherwise, returns an error)
@@ -12,61 +10,69 @@ class ClientDao {
     if (name === undefined || name === "") {
       throw new ApiError(400, "Every client must have a none-empty name!");
     }
-
     if (email === undefined || email === "") {
       throw new ApiError(400, "Every client must have a valid email!");
     }
-
-    const client = new Client(name, email);
-    this.clients.push(client);
-    return client;
+    try {
+      const client = await Client.create({name, email});
+      return client;
+    } catch (err) {
+      throw new ApiError(400, err.message)
+    }
   }
 
   // clients may not change their email!
   // returns the updated client data
   // returns an error if there is no client with the given ID
   async update(id, { name }) {
-    const index = this.clients.findIndex((client) => client._id === id);
-
-    if (index === -1) {
-      throw new ApiError(404, "There is no client with the given ID!");
-    }
-
-    if (name !== undefined) {
-      this.clients[index].name = name;
-    }
-
-    return this.clients[index];
+    const client = client.findByIdAndUpdate(
+        id,
+        {name},
+        {new : true}
+    );
+      if (client === null) {
+          throw new ApiError(404, "There is no client with the given ID!");
+      }
+    return client;
   }
 
   // returns the deleted client data
   // returns an error if there is no client with the given ID
   async delete(id) {
-    const index = this.clients.findIndex((client) => client._id === id);
-
-    if (index === -1) {
-      throw new ApiError(404, "There is no client with the given ID!");
-    }
-
-    const client = this.clients[index];
-    this.clients.splice(index, 1);
-    return client;
+      const client = await Client.findByIdAndDelete(id,)
+          .select("-__v");
+      if (client === null) {
+          throw new ApiError(404, "There is no client with the given ID!");
+      }
+      return client;
   }
 
   // returns an empty array if there is no client with the given ID
   async read(id) {
-    return this.clients.find((client) => client._id === id);
+      const client = await Client.findById(id);
+      if (client === null) {
+          throw new ApiError(404, "There is no client with the given ID!");
+      }
+      return client;
+
   }
 
   // returns an empty array if there is no client in the database
   //  or no client matches the search queries
   async readAll(query = "") {
+    const filter = {}
+
     if (query !== "") {
-      return this.clients.filter(
-        (client) => client.name === query || client.email === query
-      );
+      if (filter.name === query) {
+        filter.name = query;
+      }
+      if (filter.email === query) {
+        filter.email = query;
+      }
     }
-    return this.clients;
+
+    const client = await Client.find(filter);
+    return client;
   }
 }
 
